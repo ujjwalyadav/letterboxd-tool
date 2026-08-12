@@ -71,7 +71,7 @@ jobs:
       - name: Assemble static site
         run: |
           mkdir -p dist
-          cp index.html statistics.html map.html about.html dist/
+          cp index.html statistics.html map.html about.html review.html dist/
           cp -R assets dist/assets
           touch dist/.nojekyll
 
