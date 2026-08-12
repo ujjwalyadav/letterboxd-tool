@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,13 +37,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Restore TMDB cache
+      # This persists BOTH caches between workflow runs:
+      #   .cache/tmdb.json
+      #   .cache/letterboxd_community.json
+      #
+      # GitHub Actions caches are immutable, so github.run_id deliberately makes
+      # each saved cache unique while restore-keys finds the newest previous one.
+      - name: Restore metadata caches
         uses: actions/cache@v4
         with:
           path: .cache
-          key: tmdb-${{ runner.os }}-${{ hashFiles('data/*.csv') }}-${{ github.run_id }}
+          key: film-atlas-metadata-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            tmdb-${{ runner.os }}-${{ hashFiles('data/*.csv') }}-
+            film-atlas-metadata-${{ runner.os }}-
             tmdb-${{ runner.os }}-
 
       - name: Build enriched catalog
@@ -51,6 +58,14 @@ jobs:
           TMDB_LANGUAGE: en-US
           TMDB_REGION: DE
           TMDB_CACHE_DAYS: "30"
+
+          # Community statistics are reused from
+          # .cache/letterboxd_community.json. Only missing/stale titles are
+          # requested from Letterboxd.
+          LETTERBOXD_SCRAPE_ENABLED: "1"
+          LETTERBOXD_COMMUNITY_REFRESH_DAYS: "90"
+          LETTERBOXD_WORKERS: "8"
+          LETTERBOXD_REQUEST_DELAY: "0.15"
         run: python scripts/enrich.py
 
       - name: Assemble static site
