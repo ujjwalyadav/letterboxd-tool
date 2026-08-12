@@ -117,6 +117,7 @@ export async function initShell() {
           <a href="index.html" class="${current === "index.html" ? "active" : ""}">Explore</a>
           <a href="statistics.html" class="${current === "statistics.html" ? "active" : ""}">Statistics</a>
           <a href="map.html" class="${current === "map.html" ? "active" : ""}">Map</a>
+          <a href="review.html" class="${current === "review.html" ? "active" : ""}">Review</a>
           <a href="about.html" class="${current === "about.html" ? "active" : ""}">About</a>
         </nav>
         <div class="header-actions">

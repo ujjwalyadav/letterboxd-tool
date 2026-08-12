@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review unresolved TMDB matches and unknown media types in My Film Atlas.">
+  <meta name="theme-color" content="#0d1014">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Needs Review · My Film Atlas</title>
+</head>
+<body data-page-title="Needs Review">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header id="site-header"></header>
+
+  <main id="main" class="page-shell">
+    <section class="review-hero">
+      <div>
+        <div class="eyebrow">Catalog quality control</div>
+        <h1>Needs review</h1>
+        <p>Fix titles TMDB could not identify, weak matches, and entries whose format is still unknown. Corrections are saved in this browser until you download the replacement override CSV files.</p>
+      </div>
+      <div class="review-actions">
+        <button class="button" id="download-tmdb-overrides">Download TMDB overrides</button>
+        <button class="button" id="download-media-overrides">Download media-type overrides</button>
+      </div>
+    </section>
+
+    <section class="review-summary" id="review-summary" aria-label="Review summary"></section>
+
+    <section class="review-toolbar" aria-label="Review filters">
+      <div class="review-tabs" id="review-tabs">
+        <button class="review-tab active" data-kind="all">All</button>
+        <button class="review-tab" data-kind="unresolved">Unresolved</button>
+        <button class="review-tab" data-kind="unknown">Unknown type</button>
+        <button class="review-tab" data-kind="weak">Weak match</button>
+        <button class="review-tab" data-kind="corrected">Corrections saved</button>
+      </div>
+      <input class="field review-search" id="review-search" type="search" placeholder="Search title, year, reason…">
+    </section>
+
+    <section class="review-help card-shell">
+      <div>
+        <h2>How corrections work</h2>
+        <p>This is a static GitHub Pages site, so it cannot write directly into your repository. Use this page to prepare corrections, then download the generated CSV file(s), replace the matching files in <code>data/</code>, commit them, and let GitHub Actions rebuild the catalog.</p>
+      </div>
+      <div class="review-help-links">
+        <a class="button small" href="https://www.themoviedb.org/search" target="_blank" rel="noreferrer">Open TMDB search</a>
+        <button class="button small" id="browse-all-titles" type="button">Browse all titles</button>
+        <button class="button small" id="clear-review-drafts">Clear browser corrections</button>
+      </div>
+    </section>
+
+    <section id="review-list" class="review-list" aria-live="polite"></section>
+    <div id="review-empty" class="empty-state" hidden>
+      <h2>Nothing to review here.</h2>
+      <p>Your current filter has no unresolved or ambiguous titles.</p>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script type="module" src="assets/js/review.js"></script>
+</body>
+</html>
