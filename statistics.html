@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Personal film statistics from your Letterboxd history and watchlist.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Statistics · My Film Atlas</title>
+</head>
+<body data-page-title="Statistics">
+  <a class="skip-link" href="#main">Skip to content</a><header id="site-header"></header>
+  <main id="main" class="page-shell">
+    <section class="hero" style="min-height:260px">
+      <div class="hero-orbit" aria-hidden="true"></div>
+      <div class="hero-copy"><div class="eyebrow">Your viewing patterns</div><h1 style="font-size:clamp(2.5rem,6vw,5rem)">Statistics without the noise.</h1><p>See where your time goes, what you rate highly, the creators and places you return to, and what your watchlist says about your future viewing.</p></div>
+    </section>
+    <div class="section-header"><div><h2>Overview</h2><p>Change the scope to compare what you have seen with what you are planning to see.</p></div><select class="select" id="scope" style="width:auto"><option value="watched">Watched</option><option value="watchlist">Watchlist</option><option value="all">Everything</option></select></div>
+    <section class="kpi-strip" id="kpi-strip"></section>
+    <div id="stats-root">
+      <section class="insight-banner">
+        <div><div class="eyebrow">Taste fingerprint</div><h2 style="margin:6px 0 10px">The shape of your cinema</h2><p id="taste-summary"></p></div>
+        <div class="insight-tags" id="taste-tags"></div>
+      </section>
+
+      <section class="section stats-grid">
+        <article class="surface stat-card wide"><div class="card-heading"><div><h3>Watching activity</h3><p>Diary entries by year</p></div></div><div class="chart-wrap"><canvas id="watching-by-year"></canvas></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Your rating curve</h3><p>Personal Letterboxd ratings</p></div></div><div class="chart-wrap"><canvas id="rating-distribution"></canvas></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Top genres</h3><p>Most represented categories</p></div></div><div class="chart-wrap"><canvas id="genre-chart"></canvas></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Decades</h3><p>Where your films come from in time</p></div></div><div class="chart-wrap"><canvas id="decade-chart"></canvas></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Runtime profile</h3><p>How long your films tend to be</p></div></div><div class="chart-wrap"><canvas id="runtime-chart"></canvas></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Directors</h3><p>Your most represented filmmakers</p></div></div><div class="rank-list" id="director-list"></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Actors</h3><p>Most frequent top-billed cast</p></div></div><div class="rank-list" id="actor-list"></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Countries</h3><p>Production-country representation</p></div></div><div class="rank-list" id="country-list"></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Original languages</h3><p>Language diversity</p></div></div><div class="rank-list" id="language-list"></div></article>
+        <article class="surface stat-card full small"><div class="card-heading"><div><h3>Secondary metrics</h3><p>Useful context beyond counts</p></div></div><div class="meta-grid" id="secondary-metrics"></div></article>
+      </section>
+
+      <section class="section"><div class="section-header"><div><h2>Watchlist intelligence</h2><p>Not just how many films are waiting, but how long, how short, and which highly rated options are already in reach.</p></div><a class="button" href="index.html?collection=watchlist">Open watchlist</a></div><div class="about-grid" id="watchlist-insights"></div></section>
+    </div>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script type="module" src="assets/js/statistics.js"></script>
+</body>
+</html>

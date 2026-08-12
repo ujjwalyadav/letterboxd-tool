@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive map of countries represented in your personal film history.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <title>Map · My Film Atlas</title>
+</head>
+<body data-page-title="Map">
+  <a class="skip-link" href="#main">Skip to content</a><header id="site-header"></header>
+  <main id="main" class="page-shell">
+    <section class="hero" style="min-height:260px"><div class="hero-orbit" aria-hidden="true"></div><div class="hero-copy"><div class="eyebrow">Film geography</div><h1 style="font-size:clamp(2.5rem,6vw,5rem)">Where your cinema comes from.</h1><p>Map the production countries represented in your viewing history or watchlist. Click a country to jump straight into the films behind it.</p></div></section>
+    <div class="section-header"><div><h2>World map</h2><p>Counts use TMDB production-country metadata. A film with multiple production countries contributes to each listed country.</p></div><select class="select" id="map-scope" style="width:auto"><option value="watched">Watched</option><option value="watchlist">Watchlist</option><option value="all">Everything</option></select></div>
+    <div class="map-layout">
+      <div><div id="world-map" aria-label="Interactive world map"></div><div class="map-legend" style="margin-top:10px"><span>0</span><div class="legend-gradient"></div><span id="map-max">0</span><span>films</span></div></div>
+      <aside class="map-sidebar">
+        <section class="surface"><div class="card-heading"><div><h3>Geography at a glance</h3><p>Coverage in the current scope</p></div></div><div class="meta-grid" id="map-metrics" style="grid-template-columns:1fr 1fr"></div></section>
+        <section class="surface"><div class="card-heading"><div><h3>Most represented</h3><p>Click to filter your library</p></div></div><div id="top-countries"></div></section>
+        <section class="surface"><div class="card-heading"><div><h3>Original languages</h3><p>Based on TMDB original language</p></div></div><div id="map-languages"></div></section>
+      </aside>
+    </div>
+    <section class="section surface"><div class="card-heading"><div><h3>Countries with no representation</h3><p><strong id="unseen-count">0</strong> ISO countries currently have zero production-country matches in this scope. This is a discovery-gap indicator, not a claim that every country has an equally large film industry.</p></div></div><div class="pill-list" id="unseen-countries"></div></section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script type="module" src="assets/js/map.js"></script>
+</body>
+</html>

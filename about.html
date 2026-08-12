@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Setup, data sources and privacy notes for My Film Atlas.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>About · My Film Atlas</title>
+</head>
+<body data-page-title="About">
+  <a class="skip-link" href="#main">Skip to content</a><header id="site-header"></header>
+  <main id="main" class="page-shell">
+    <section class="hero" style="min-height:260px"><div class="hero-orbit" aria-hidden="true"></div><div class="hero-copy"><div class="eyebrow">How it works</div><h1 style="font-size:clamp(2.5rem,6vw,5rem)">Your data stays understandable.</h1><p>The site separates your Letterboxd activity from external movie metadata, keeps API credentials out of the browser, and rebuilds automatically when you update your CSV exports.</p></div></section>
+
+    <section class="section"><div class="section-header"><div><h2>Current build</h2><p>A quick health check for the data currently powering this copy of the site.</p></div></div><div class="meta-grid surface" id="build-summary"></div></section>
+
+    <section class="section"><div class="section-header"><div><h2>Update workflow</h2><p>You only need to replace your Letterboxd CSV files. GitHub Actions does the metadata work and publishes the new static site.</p></div></div>
+      <div class="surface"><ol class="steps">
+        <li><strong>Replace your exports.</strong><br><span style="color:var(--muted)">Put updated <code>diary.csv</code>, <code>ratings.csv</code>, <code>watched.csv</code>, and <code>watchlist.csv</code> into the <code>data/</code> folder.</span></li>
+        <li><strong>Push to GitHub.</strong><br><span style="color:var(--muted)">The included workflow runs automatically whenever those files or the enrichment code change.</span></li>
+        <li><strong>Enrichment runs privately.</strong><br><span style="color:var(--muted)">The workflow reads your <code>TMDB_API_TOKEN</code> from GitHub Actions Secrets. The token is never written into the website files.</span></li>
+        <li><strong>The site republishes.</strong><br><span style="color:var(--muted)">The browser receives one generated catalog JSON containing your merged Letterboxd activity plus safe public movie metadata.</span></li>
+      </ol></div>
+    </section>
+
+    <section class="section"><div class="section-header"><div><h2>Data model</h2><p>The project intentionally preserves where each field came from.</p></div></div>
+      <div class="about-grid">
+        <article class="surface about-card"><div class="eyebrow">Letterboxd export</div><h3>Your activity</h3><p>Personal rating, diary entries, rewatch flags, tags, watched status, watchlist status, and the dates included in your export remain your authoritative personal data.</p></article>
+        <article class="surface about-card"><div class="eyebrow">TMDB</div><h3>Film metadata</h3><p>Runtime, genres, production countries, languages, directors, writers, cast, keywords, posters, backdrops, TMDB rating/vote count, popularity and other movie metadata are fetched during the build.</p></article>
+        <article class="surface about-card"><div class="eyebrow">Optional</div><h3>Letterboxd community stats</h3><p>The template <code>data/letterboxd_community.csv</code> supports average rating, watches and likes if you obtain them from an authorized/manual source. The project does not scrape Letterboxd pages.</p></article>
+      </div>
+    </section>
+
+    <section class="section"><div class="section-header"><div><h2>Important Letterboxd limitation</h2><p>Your own ratings are fully supported because they are in the export. Community-wide Letterboxd averages/watch counts are different.</p></div></div>
+      <div class="surface"><p>Letterboxd's official API is currently request-only, and its API-access page says it is not granting access for personal/private projects or data-analysis, visualization and recommendation projects. For that reason this project does not depend on unofficial scraping. Your personal Letterboxd ratings remain available, while community-wide fields are optional through <code>letterboxd_community.csv</code>.</p><a class="button" href="https://letterboxd.com/api-beta/" target="_blank" rel="noreferrer">Letterboxd API information</a></div>
+    </section>
+
+    <section class="section"><div class="section-header"><div><h2>TMDB & streaming attribution</h2><p>Required credits for the external movie metadata used by this project.</p></div></div>
+      <div class="surface" style="display:grid;grid-template-columns:minmax(160px,240px) minmax(0,1fr);gap:24px;align-items:center">
+        <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer" aria-label="TMDB"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg" alt="TMDB logo" style="max-height:120px;margin:auto"></a>
+        <div><p><strong>This product uses the TMDB API but is not endorsed or certified by TMDB.</strong></p><p style="color:var(--muted)">TMDB provides the film metadata and images used in the enriched catalog. Watch-provider availability returned by TMDB is powered by JustWatch; availability is presented as informational metadata and links back through TMDB.</p><div class="dialog-links"><a class="button small" href="https://developer.themoviedb.org/docs/faq" target="_blank" rel="noreferrer">TMDB API / attribution</a><a class="button small" href="https://developer.themoviedb.org/reference/movie-watch-providers" target="_blank" rel="noreferrer">JustWatch provider attribution</a></div></div>
+      </div>
+    </section>
+
+    <section class="section"><div class="section-header"><div><h2>Privacy</h2><p>Think about what you are publishing before you make the repository or Pages site public.</p></div></div>
+      <div class="surface"><p>Your Letterboxd export can include viewing dates and personal tags. The deployed Pages artifact does not include the raw CSV files, but the generated catalog contains the personal fields needed by the website. Also remember that if your GitHub repository itself is public, files committed to <code>data/</code> are publicly readable from the repository even if they are not part of the Pages artifact.</p><p style="color:var(--muted);margin-bottom:0">If any tags or viewing information are private, remove them before committing or use a repository/hosting setup whose access model fits your needs.</p></div>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script type="module" src="assets/js/about.js"></script>
+</body>
+</html>

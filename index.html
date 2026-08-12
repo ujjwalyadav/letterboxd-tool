@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A personal film explorer built from a Letterboxd export and enriched with movie metadata.">
+  <meta name="theme-color" content="#0d1014">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Explore · My Film Atlas</title>
+</head>
+<body data-page-title="Explore">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header id="site-header"></header>
+  <main id="main" class="page-shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-orbit" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <div class="eyebrow" data-config-display-name>Personal film intelligence</div>
+        <h1 id="hero-title">Your cinema,<br>properly searchable.</h1>
+        <p data-config-tagline>Explore your watched films and watchlist by the details that actually matter: creators, countries, languages, runtimes, genres, keywords, ratings, dates, and more.</p>
+      </div>
+    </section>
+
+    <section class="kpi-strip" id="kpi-strip" aria-label="Library overview"></section>
+
+    <section class="explore-layout">
+      <aside class="filters" id="filters" aria-label="Film filters">
+        <div class="filter-heading">
+          <h2>Filters</h2>
+          <div style="display:flex;gap:6px">
+            <button class="button small" id="reset-filters">Reset</button>
+            <button class="icon-button" id="close-mobile-filters" aria-label="Close filters">×</button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label for="search">Search everything</label>
+          <input class="field" id="search" type="search" placeholder="Title, actor, director, keyword…" autocomplete="off">
+        </div>
+
+        <div class="filter-group">
+          <label for="collection">Collection</label>
+          <select class="select" id="collection">
+            <option value="all">Everything</option>
+            <option value="watched">Watched</option>
+            <option value="diary">Diary entries</option>
+            <option value="watchlist">Watchlist</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Release year</label>
+          <div class="range-row">
+            <input class="field" id="year-from" type="number" min="1880" max="2100" placeholder="From">
+            <span>–</span>
+            <input class="field" id="year-to" type="number" min="1880" max="2100" placeholder="To">
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Runtime in minutes</label>
+          <div class="range-row">
+            <input class="field" id="runtime-min" type="number" min="1" placeholder="Min">
+            <span>–</span>
+            <input class="field" id="runtime-max" type="number" min="1" placeholder="Max">
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Your Letterboxd rating</label>
+          <div class="range-row">
+            <input class="field" id="rating-min" type="number" min="0.5" max="5" step="0.5" placeholder="Min">
+            <span>–</span>
+            <input class="field" id="rating-max" type="number" min="0.5" max="5" step="0.5" placeholder="Max">
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label for="tmdb-rating-min">TMDB rating at least</label>
+          <input class="field" id="tmdb-rating-min" type="number" min="0" max="10" step="0.1" placeholder="e.g. 7.5">
+          <label for="tmdb-votes-min" style="margin-top:10px">TMDB vote count at least</label>
+          <input class="field" id="tmdb-votes-min" type="number" min="0" step="100" placeholder="e.g. 1000">
+          <label for="lb-rating-min" style="margin-top:10px">Letterboxd community avg at least <span style="font-weight:400">(optional data)</span></label>
+          <input class="field" id="lb-rating-min" type="number" min="0" max="5" step="0.01" placeholder="e.g. 3.8">
+          <label for="lb-watches-min" style="margin-top:10px">Letterboxd watches at least <span style="font-weight:400">(optional data)</span></label>
+          <input class="field" id="lb-watches-min" type="number" min="0" step="100" placeholder="e.g. 10000">
+        </div>
+
+        <div class="filter-group">
+          <label for="rewatch">Rewatch history</label>
+          <select class="select" id="rewatch">
+            <option value="all">Any</option>
+            <option value="yes">Rewatched at least once</option>
+            <option value="no">Watched, never rewatched</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="added-after">Added to watchlist after</label>
+          <input class="field" id="added-after" type="date">
+          <label for="watched-after" style="margin-top:10px">Last watched after</label>
+          <input class="field" id="watched-after" type="date">
+        </div>
+
+        <div id="facet-root">
+          <div class="filter-group">
+            <label>Genres</label><input class="field filter-search" data-facet-search="genres" placeholder="Find genre…"><div class="filter-tags" data-facet-panel="genres"></div>
+          </div>
+          <div class="filter-group">
+            <label>Countries</label><input class="field filter-search" data-facet-search="countries" placeholder="Find country…"><div class="filter-tags" data-facet-panel="countries"></div>
+          </div>
+          <div class="filter-group">
+            <label>Languages</label><input class="field filter-search" data-facet-search="languages" placeholder="Find language…"><div class="filter-tags" data-facet-panel="languages"></div>
+          </div>
+          <div class="filter-group">
+            <label>Directors</label><input class="field filter-search" data-facet-search="directors" placeholder="Find director…"><div class="filter-tags" data-facet-panel="directors"></div>
+          </div>
+          <div class="filter-group">
+            <label>Writers</label><input class="field filter-search" data-facet-search="writers" placeholder="Find writer…"><div class="filter-tags" data-facet-panel="writers"></div>
+          </div>
+          <div class="filter-group">
+            <label>Cast</label><input class="field filter-search" data-facet-search="cast" placeholder="Find actor…"><div class="filter-tags" data-facet-panel="cast"></div>
+          </div>
+          <div class="filter-group">
+            <label>Production companies</label><input class="field filter-search" data-facet-search="companies" placeholder="Find company…"><div class="filter-tags" data-facet-panel="companies"></div>
+          </div>
+          <div class="filter-group">
+            <label>Certification</label><input class="field filter-search" data-facet-search="certifications" placeholder="Find certification…"><div class="filter-tags" data-facet-panel="certifications"></div>
+          </div>
+          <div class="filter-group">
+            <label>Keywords</label><input class="field filter-search" data-facet-search="keywords" placeholder="Find keyword…"><div class="filter-tags" data-facet-panel="keywords"></div>
+          </div>
+          <div class="filter-group">
+            <label>Your diary tags</label><input class="field filter-search" data-facet-search="tags" placeholder="Find tag…"><div class="filter-tags" data-facet-panel="tags"></div>
+          </div>
+          <div class="filter-group">
+            <label>Availability providers</label><input class="field filter-search" data-facet-search="providers" placeholder="Find provider…"><div class="filter-tags" data-facet-panel="providers"></div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="catalog-panel" aria-label="Film catalog">
+        <div class="catalog-toolbar">
+          <button class="button mobile-filter-button" id="mobile-filter-button">Filters</button>
+          <div class="result-count"><strong id="filtered-count">0</strong><span id="filtered-context">films</span></div>
+          <div class="toolbar-group">
+            <select class="select" id="saved-views" aria-label="Saved filter views"><option value="">Saved views…</option></select>
+            <button class="button small" id="save-view">Save view</button>
+          </div>
+          <div class="toolbar-group">
+            <button class="button small" id="surprise-me">Surprise me</button>
+            <button class="button small" id="export-filtered">Export CSV</button>
+          </div>
+          <div class="toolbar-group">
+            <select class="select" id="sort" aria-label="Sort films">
+              <option value="title-asc">Title A–Z</option>
+              <option value="title-desc">Title Z–A</option>
+              <option value="year-desc">Newest release</option>
+              <option value="year-asc">Oldest release</option>
+              <option value="rating-desc">Your highest rating</option>
+              <option value="tmdb-desc">Highest TMDB rating</option>
+              <option value="votes-desc">Most TMDB votes</option>
+              <option value="popularity-desc">TMDB popularity</option>
+              <option value="runtime-asc">Shortest runtime</option>
+              <option value="runtime-desc">Longest runtime</option>
+              <option value="last-watched-desc">Recently watched</option>
+              <option value="watchlist-oldest">Oldest on watchlist</option>
+            </select>
+            <button class="button small" id="grid-view" aria-label="Grid view">Grid</button>
+            <button class="button small" id="list-view" aria-label="List view">List</button>
+          </div>
+        </div>
+        <div class="active-filters" id="active-filters"></div>
+        <div id="movie-results" class="movie-grid" aria-live="polite"></div>
+        <div class="load-more" id="load-more-wrap"><button class="button" id="load-more">Load more</button></div>
+        <p class="filter-summary" id="data-status"></p>
+      </section>
+    </section>
+  </main>
+  <footer id="site-footer"></footer>
+  <script type="module" src="assets/js/explore.js"></script>
+</body>
+</html>
