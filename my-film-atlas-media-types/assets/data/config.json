@@ -1,9 +1,0 @@
-{
-  "siteTitle": "My Film Atlas",
-  "displayName": "My cinema",
-  "tagline": "A personal map of what I have seen, loved, revisited, and still want to discover.",
-  "defaultCollection": "all",
-  "region": "DE",
-  "itemsPerPage": 48,
-  "showAdultTitles": false
-}
