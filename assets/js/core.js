@@ -152,7 +152,7 @@ export async function initShell() {
 export function renderKpis(container, stats) {
   if (!container) return;
   const kpis = [
-    ["Watched", formatNumber(stats.watched), "unique films"],
+    ["Watched", formatNumber(stats.watched), "unique titles"],
     ["Diary", formatNumber(stats.diaryEntries), "logged watches"],
     ["Watchlist", formatNumber(stats.watchlist), "waiting for you"],
     ["Average rating", stats.avgRating == null ? "—" : stats.avgRating.toFixed(2), "out of 5"],
@@ -164,7 +164,7 @@ export function renderKpis(container, stats) {
 export function filmSearchText(film) {
   const t = film.tmdb || {};
   return [
-    film.name, film.year, t.title, t.original_title, t.overview, t.tagline,
+    film.name, film.year, mediaTypeLabel(film), film.media_type, t.title, t.original_title, t.series_name, t.overview, t.tagline,
     ...(t.genres || []), ...(t.keywords || []),
     ...(t.directors || []).map(x => x.name), ...(t.writers || []).map(x => x.name),
     ...(t.cast || []).map(x => x.name), ...(t.production_companies || []).map(x => x.name), t.certification,
@@ -192,6 +192,22 @@ export function ratingLabel(value) {
   return value == null ? "Unrated" : `★ ${Number(value).toFixed(1)}`;
 }
 
+export const MEDIA_TYPE_LABELS = {
+  feature_film: "Feature film", short_film: "Short film", limited_series: "Limited series",
+  tv_series: "TV series", tv_episode: "TV episode", unknown: "Unknown",
+};
+export function mediaTypeLabel(filmOrType) {
+  const type = typeof filmOrType === "string" ? filmOrType : filmOrType?.media_type;
+  return MEDIA_TYPE_LABELS[type] || "Unknown";
+}
+export function tmdbEntityUrl(t) {
+  if (!t?.id) return null;
+  if (t.media_kind === "tv_episode" && t.series_id != null && t.season_number != null && t.episode_number != null)
+    return `https://www.themoviedb.org/tv/${Number(t.series_id)}/season/${Number(t.season_number)}/episode/${Number(t.episode_number)}`;
+  if (t.media_kind === "tv") return `https://www.themoviedb.org/tv/${Number(t.id)}`;
+  return `https://www.themoviedb.org/movie/${Number(t.id)}`;
+}
+
 export function createFilmCard(film, view = "grid") {
   const t = film.tmdb || {};
   const rating = film.user?.rating;
@@ -202,14 +218,14 @@ export function createFilmCard(film, view = "grid") {
     <article class="movie-card" tabindex="0" data-film-key="${escapeHtml(film.key)}" aria-label="Open ${escapeHtml(film.name)}">
       <div class="poster-wrap">
         <img class="poster" src="${escapeHtml(poster)}" alt="${escapeHtml(film.name)} poster" loading="lazy" onerror="this.src='assets/img/poster-placeholder.svg'">
-        <div class="card-badges"><span class="badge ${status === "Watchlist" ? "accent" : ""}">${status}</span>${rating != null ? `<span class="badge">★ ${Number(rating).toFixed(1)}</span>` : ""}</div>
+        <div class="card-badges"><span class="badge ${status === "Watchlist" ? "accent" : ""}">${status}</span><span class="badge media-type-badge">${escapeHtml(mediaTypeLabel(film))}</span>${rating != null ? `<span class="badge">★ ${Number(rating).toFixed(1)}</span>` : ""}</div>
         <div class="card-actions"><button class="button small" data-open-card>Details</button></div>
       </div>
       <div class="movie-meta">
         <div class="movie-title" title="${escapeHtml(film.name)}">${escapeHtml(film.name)}</div>
         <div class="movie-subtitle"><span>${film.year || "—"}</span>${t.runtime ? `<span>${formatRuntime(t.runtime)}</span>` : ""}${countries ? `<span>${escapeHtml(countries)}</span>` : ""}</div>
       </div>
-      <div class="list-extra">${t.vote_average ? `TMDB ${Number(t.vote_average).toFixed(1)}` : ""}${t.directors?.[0]?.name ? `<br>${escapeHtml(t.directors[0].name)}` : ""}</div>
+      <div class="list-extra">${escapeHtml(mediaTypeLabel(film))}${t.vote_average ? `<br>TMDB ${Number(t.vote_average).toFixed(1)}` : ""}${t.directors?.[0]?.name ? `<br>${escapeHtml(t.directors[0].name)}` : ""}</div>
     </article>`;
 }
 
@@ -251,7 +267,7 @@ export function openFilmDialog(film) {
   const heroStyle = t.backdrop ? `style="background-image:url('${escapeHtml(t.backdrop)}')"` : "";
   const externalLinks = [
     film.letterboxd_uri ? `<a class="button small" href="${escapeHtml(film.letterboxd_uri)}" target="_blank" rel="noreferrer">Letterboxd</a>` : "",
-    t.id ? `<a class="button small" href="https://www.themoviedb.org/movie/${Number(t.id)}" target="_blank" rel="noreferrer">TMDB</a>` : "",
+    tmdbEntityUrl(t) ? `<a class="button small" href="${escapeHtml(tmdbEntityUrl(t))}" target="_blank" rel="noreferrer">TMDB</a>` : "",
     t.imdb_id ? `<a class="button small" href="https://www.imdb.com/title/${escapeHtml(t.imdb_id)}/" target="_blank" rel="noreferrer">IMDb</a>` : "",
     providers.link ? `<a class="button small" href="${escapeHtml(providers.link)}" target="_blank" rel="noreferrer">Where to watch (${escapeHtml(providers.region || "")})</a>` : "",
   ].join("");
@@ -261,7 +277,7 @@ export function openFilmDialog(film) {
       <div class="dialog-main">
         <div class="dialog-poster"><img class="poster" src="${escapeHtml(posterFor(film))}" alt="${escapeHtml(film.name)} poster" onerror="this.src='assets/img/poster-placeholder.svg'"></div>
         <div class="dialog-title">
-          <div class="eyebrow">${u.watchlist ? "On your watchlist" : (u.watched ? "In your film history" : "Film")}</div>
+          <div class="eyebrow">${escapeHtml(mediaTypeLabel(film))} · ${u.watchlist ? "On your watchlist" : (u.watched ? "In your history" : "Saved")}</div>
           <h2>${escapeHtml(film.name)}${film.year ? ` <span style="font-weight:400;color:#bac2ca">${film.year}</span>` : ""}</h2>
           <p>${escapeHtml(t.tagline || t.overview || "No synopsis available yet. Add TMDB enrichment to fill in film metadata.")}</p>
         </div>
@@ -270,6 +286,7 @@ export function openFilmDialog(film) {
     <div class="dialog-body">
       <div>
         <div class="meta-grid">
+          <div class="meta-item"><span>Format</span><strong>${escapeHtml(mediaTypeLabel(film))}</strong></div>
           <div class="meta-item"><span>Your rating</span><strong>${ratingLabel(u.rating)}</strong></div>
           <div class="meta-item"><span>TMDB rating</span><strong>${t.vote_average ? `${Number(t.vote_average).toFixed(1)} / 10` : "—"}</strong></div>
           <div class="meta-item"><span>Runtime</span><strong>${formatRuntime(t.runtime)}</strong></div>
@@ -280,6 +297,8 @@ export function openFilmDialog(film) {
           <div class="meta-item"><span>Release date</span><strong>${formatDate(t.release_date)}</strong></div>
           <div class="meta-item"><span>Certification (${escapeHtml(providers.region || "region")})</span><strong>${escapeHtml(t.certification || "—")}</strong></div>
         </div>
+        ${t.media_kind === "tv_episode" ? `<div class="detail-section"><h3>Episode</h3><p style="color:var(--soft)">${escapeHtml(t.series_name || "Series")} · S${String(t.season_number ?? "?").padStart(2,"0")}E${String(t.episode_number ?? "?").padStart(2,"0")}</p></div>` : ""}
+        ${t.media_kind === "tv" ? `<div class="detail-section"><h3>Series</h3><p style="color:var(--soft)">${t.number_of_episodes ? `${formatNumber(t.number_of_episodes)} episodes` : ""}${t.number_of_seasons ? ` · ${formatNumber(t.number_of_seasons)} season${Number(t.number_of_seasons)===1?"":"s"}` : ""}${t.episode_runtime ? ` · about ${formatRuntime(t.episode_runtime)} per episode` : ""}</p></div>` : ""}
         <div class="detail-section"><h3>Overview</h3><p style="color:var(--soft)">${escapeHtml(t.overview || "No overview available.")}</p></div>
         <div class="detail-section"><h3>Genres</h3><div class="pill-list">${(t.genres || []).map(x => `<span class="pill">${escapeHtml(x)}</span>`).join("") || '<span class="pill">No data</span>'}</div></div>
         <div class="detail-section"><h3>Countries</h3><div class="pill-list">${countries}</div></div>
@@ -313,11 +332,11 @@ export function csvEscape(value) {
 }
 
 export function exportFilmsCsv(films, filename = "film-atlas-filtered.csv") {
-  const headers = ["Name","Year","Your Rating","Watched","Watchlist","Watch Count","Last Watched","Runtime","Genres","Countries","Languages","Directors","Cast","Keywords","TMDB Rating","TMDB Votes","TMDB Popularity","Letterboxd URI","TMDB ID"];
+  const headers = ["Name","Year","Format","Format Source","Your Rating","Watched","Watchlist","Watch Count","Last Watched","Runtime","Genres","Countries","Languages","Directors","Cast","Keywords","TMDB Rating","TMDB Votes","TMDB Popularity","Letterboxd URI","TMDB ID"];
   const rows = films.map(f => {
     const t = f.tmdb || {}, u = f.user || {};
     return [
-      f.name, f.year, u.rating, u.watched, u.watchlist, u.watch_count, u.last_watched, t.runtime,
+      f.name, f.year, mediaTypeLabel(f), f.media_type_source, u.rating, u.watched, u.watchlist, u.watch_count, u.last_watched, t.runtime,
       t.genres || [], (t.production_countries || []).map(x => x.code), (t.spoken_languages || []).map(x => x.code),
       (t.directors || []).map(x => x.name), (t.cast || []).map(x => x.name), t.keywords || [],
       t.vote_average, t.vote_count, t.popularity, f.letterboxd_uri, t.id,

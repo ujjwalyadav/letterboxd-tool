@@ -7,6 +7,7 @@ let geoLayer;
 let features = [];
 let currentCounts = new Map();
 let currentScope = "watched";
+let currentMediaType = "all";
 
 function countCountries(films) {
   const m = new Map();
@@ -19,9 +20,9 @@ function countLanguages(films) {
   return m;
 }
 function scopeFilms(scope) {
-  if (scope === "watchlist") return catalog.filter(f=>f.user?.watchlist);
-  if (scope === "all") return catalog;
-  return catalog.filter(f=>f.user?.watched);
+  let films = scope === "watchlist" ? catalog.filter(f=>f.user?.watchlist) : scope === "all" ? catalog : catalog.filter(f=>f.user?.watched);
+  if (currentMediaType !== "all") films = films.filter(f => (f.media_type || "unknown") === currentMediaType);
+  return films;
 }
 function fillFor(count, max) {
   if (!count) return "rgba(157,168,181,.10)";
@@ -44,7 +45,7 @@ function onEachFeature(feature, layer) {
   const count = currentCounts.get(code) || 0;
   layer.bindTooltip(`${name}: ${formatNumber(count)} film${count===1?"":"s"}`, { sticky:true });
   if (code) {
-    layer.on("click", () => { const c = currentScope === "watchlist" ? "&collection=watchlist" : currentScope === "watched" ? "&collection=watched" : ""; location.href = `index.html?country=${encodeURIComponent(code)}${c}`; });
+    layer.on("click", () => { const c = currentScope === "watchlist" ? "&collection=watchlist" : currentScope === "watched" ? "&collection=watched" : ""; const t=currentMediaType!=="all"?`&type=${encodeURIComponent(currentMediaType)}`:""; location.href = `index.html?country=${encodeURIComponent(code)}${c}${t}`; });
     layer.on("mouseover", e => e.target.setStyle({ weight:1.5, color:"rgba(255,255,255,.68)" }));
     layer.on("mouseout", e => geoLayer.resetStyle(e.target));
   }
@@ -69,7 +70,7 @@ function renderSide(films) {
   const sorted = [...currentCounts.entries()].sort((a,b)=>b[1]-a[1]);
   const topCount = sorted[0]?.[1] || 1;
   $("#top-countries").innerHTML = sorted.slice(0,15).map(([code,count])=>`<div class="country-row" data-code="${code}"><span>${countryName(code)}</span><span class="country-count">${formatNumber(count)}</span></div>`).join("") || '<p style="color:var(--muted)">No country metadata yet.</p>';
-  $("#top-countries").onclick = e => { const row=e.target.closest("[data-code]"); if(row) { const c = currentScope === "watchlist" ? "&collection=watchlist" : currentScope === "watched" ? "&collection=watched" : ""; location.href=`index.html?country=${row.dataset.code}${c}`; } };
+  $("#top-countries").onclick = e => { const row=e.target.closest("[data-code]"); if(row) { const c = currentScope === "watchlist" ? "&collection=watchlist" : currentScope === "watched" ? "&collection=watched" : ""; const t=currentMediaType!=="all"?`&type=${encodeURIComponent(currentMediaType)}`:""; location.href=`index.html?country=${row.dataset.code}${c}${t}`; } };
 
   const represented = new Set(currentCounts.keys());
   const allCodes = [...new Set(Object.values(ISO_NUMERIC_TO_A2))].sort((a,b)=>countryName(a).localeCompare(countryName(b)));
@@ -109,5 +110,6 @@ async function main() {
   catch(err) { console.error(err); $("#world-map").innerHTML=`<div class="empty-state"><h3>Map could not load</h3><p>${err.message}</p></div>`; }
   render("watched");
   $("#map-scope").addEventListener("change", e=>render(e.target.value));
+  $("#map-media-type").addEventListener("change", e=>{ currentMediaType=e.target.value; render(currentScope); });
 }
 main().catch(console.error);

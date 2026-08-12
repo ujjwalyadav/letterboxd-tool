@@ -13,6 +13,7 @@ It is designed for a simple maintenance loop: replace your Letterboxd CSV files,
 - Release-year range
 - Runtime range
 - Your Letterboxd rating range
+- Format filtering everywhere: feature film, short film, limited series, TV series, TV episode, unknown
 - TMDB rating and vote-count thresholds
 - Rewatch filtering
 - Watchlist-added and last-watched date filters
@@ -75,6 +76,7 @@ It is designed for a simple maintenance loop: replace your Letterboxd CSV files,
 │   ├── watched.csv
 │   ├── watchlist.csv
 │   ├── tmdb_overrides.csv
+│   ├── media_type_overrides.csv
 │   └── letterboxd_community.csv
 ├── scripts/enrich.py
 └── .github/workflows/deploy-pages.yml
@@ -138,7 +140,7 @@ The GitHub workflow currently sets `TMDB_REGION=DE` and `TMDB_LANGUAGE=en-US`. C
 
 ## 5. Fix a wrong TMDB match
 
-The script searches TMDB using title + release year and applies a conservative confidence threshold. Ambiguous/unmatched titles are listed in:
+The script searches TMDB movie and TV results and applies a conservative title/year confidence score. It also stores an explicit media format for each catalog entry. Ambiguous/unmatched titles are listed in:
 
 `assets/data/build-report.json`
 

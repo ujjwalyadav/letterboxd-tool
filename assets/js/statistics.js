@@ -1,10 +1,11 @@
 import {
   $, initShell, loadCatalog, summaryStats, renderKpis, diaryEntries,
-  average, formatNumber, countryName, languageName, formatRuntime
+  average, formatNumber, countryName, languageName, formatRuntime, mediaTypeLabel
 } from "./core.js";
 
 let allFilms = [];
 let charts = [];
+let currentMediaType = "all";
 
 function destroyCharts() { charts.forEach(c => c.destroy()); charts = []; }
 function countBy(values) {
@@ -40,13 +41,15 @@ function renderRankList(id, rows, formatter=x=>x, max=10) {
 
 function renderStats(scope) {
   destroyCharts();
-  const films = scope === "watchlist" ? allFilms.filter(f=>f.user?.watchlist) : scope === "all" ? allFilms : allFilms.filter(f=>f.user?.watched);
+  let films = scope === "watchlist" ? allFilms.filter(f=>f.user?.watchlist) : scope === "all" ? allFilms : allFilms.filter(f=>f.user?.watched);
+  if (currentMediaType !== "all") films = films.filter(f => (f.media_type || "unknown") === currentMediaType);
   const watchedFilms = films.filter(f=>f.user?.watched);
   const diary = diaryEntries(watchedFilms);
   renderKpis($("#kpi-strip"), summaryStats(scope === "watchlist" ? allFilms.filter(f => f.user?.watchlist) : films));
 
   const ratings = watchedFilms.map(f=>f.user?.rating).filter(v=>v != null);
   const runtimes = films.map(f=>f.tmdb?.runtime).filter(Boolean);
+  const mediaTypes = countBy(films.map(f=>f.media_type || "unknown"));
   const genres = countBy(films.flatMap(f=>f.tmdb?.genres || []));
   const directors = countBy(films.flatMap(f=>(f.tmdb?.directors || []).map(x=>x.name)));
   const actors = countBy(films.flatMap(f=>(f.tmdb?.cast || []).slice(0,10).map(x=>x.name)));
@@ -60,6 +63,8 @@ function renderStats(scope) {
   const ratingBuckets = Array.from({length:10},(_,i)=>(i+1)/2);
   const ratingCounts = ratingBuckets.map(r=>ratings.filter(x=>Number(x)===r).length);
   chart("rating-distribution","bar",ratingBuckets.map(x=>`${x}★`),ratingCounts,"Films");
+
+  chart("media-type-chart","bar",mediaTypes.map(x=>mediaTypeLabel(x[0])),mediaTypes.map(x=>x[1]),"Titles", { indexAxis:"y" });
 
   chart("genre-chart","bar",top(genres,10).map(x=>x[0]),top(genres,10).map(x=>x[1]),"Films", { indexAxis:"y" });
   chart("decade-chart","bar",decades.map(x=>x[0]),decades.map(x=>x[1]),"Films");
@@ -79,7 +84,11 @@ function renderStats(scope) {
   const oldestWatchlist = allFilms.filter(f=>f.user?.watchlist_added_date).sort((a,b)=>a.user.watchlist_added_date.localeCompare(b.user.watchlist_added_date))[0];
   const ratedCount = ratings.length;
   $("#secondary-metrics").innerHTML = [
-    ["Rated films", formatNumber(ratedCount)],
+    ["Rated titles", formatNumber(ratedCount)],
+    ["Feature films", formatNumber(films.filter(f=>f.media_type==="feature_film").length)],
+    ["Short films", formatNumber(films.filter(f=>f.media_type==="short_film").length)],
+    ["Limited series", formatNumber(films.filter(f=>f.media_type==="limited_series").length)],
+    ["TV episodes", formatNumber(films.filter(f=>f.media_type==="tv_episode").length)],
     ["Average runtime", avgRuntime ? formatRuntime(Math.round(avgRuntime)) : "—"],
     ["Average TMDB score", avgTmdb ? `${avgTmdb.toFixed(2)} / 10` : "—"],
     ["Rewatch diary entries", formatNumber(rewatchCount)],
@@ -123,6 +132,7 @@ async function main() {
   const data = await loadCatalog();
   allFilms = data.films || [];
   $("#scope").addEventListener("change", e=>renderStats(e.target.value));
+  $("#stats-media-type").addEventListener("change", e=>{ currentMediaType=e.target.value; renderStats($("#scope").value); });
   renderStats("watched");
 }
 main().catch(err=>{ console.error(err); $("#stats-root").innerHTML=`<div class="empty-state"><h3>Statistics unavailable</h3><p>${err.message}</p></div>`; });

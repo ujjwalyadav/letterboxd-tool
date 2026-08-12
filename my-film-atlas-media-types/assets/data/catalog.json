@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "generated_at": "2026-08-12T12:48:49Z",
+    "film_count": 0,
+    "tmdb_enabled": false,
+    "tmdb_region": "DE",
+    "tmdb_language": "en-US",
+    "matched_count": 0,
+    "unresolved_count": 0,
+    "schema_version": 2,
+    "media_type_schema": "feature_film|short_film|limited_series|tv_series|tv_episode|unknown",
+    "media_type_counts": {}
+  },
+  "facets": {
+    "year_min": null,
+    "year_max": null,
+    "runtime_max": null,
+    "genres": [],
+    "writers": [],
+    "companies": [],
+    "certifications": [],
+    "countries": [],
+    "languages": [],
+    "directors": [],
+    "cast": [],
+    "keywords": [],
+    "tags": [],
+    "providers": [],
+    "media_types": []
+  },
+  "films": []
+}

@@ -49,6 +49,13 @@
           </select>
         </div>
 
+
+        <div class="filter-group">
+          <label>Format / entry type</label>
+          <p class="filter-summary" style="margin:0 0 8px">Feature films, shorts, limited series, TV series and individual TV episodes are kept separate.</p>
+          <div class="filter-tags" data-facet-panel="media_types"></div>
+        </div>
+
         <div class="filter-group">
           <label>Release year</label>
           <div class="range-row">
@@ -143,7 +150,7 @@
       <section class="catalog-panel" aria-label="Film catalog">
         <div class="catalog-toolbar">
           <button class="button mobile-filter-button" id="mobile-filter-button">Filters</button>
-          <div class="result-count"><strong id="filtered-count">0</strong><span id="filtered-context">films</span></div>
+          <div class="result-count"><strong id="filtered-count">0</strong><span id="filtered-context">titles</span></div>
           <div class="toolbar-group">
             <select class="select" id="saved-views" aria-label="Saved filter views"><option value="">Saved views…</option></select>
             <button class="button small" id="save-view">Save view</button>
@@ -156,6 +163,7 @@
             <select class="select" id="sort" aria-label="Sort films">
               <option value="title-asc">Title A–Z</option>
               <option value="title-desc">Title Z–A</option>
+              <option value="type-asc">Format / type</option>
               <option value="year-desc">Newest release</option>
               <option value="year-asc">Oldest release</option>
               <option value="rating-desc">Your highest rating</option>

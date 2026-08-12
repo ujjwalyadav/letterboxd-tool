@@ -23,7 +23,7 @@ const state = {
   sort: "title-asc",
   view: localStorage.getItem("film-atlas-view") || "grid",
   facets: {
-    genres: new Set(), countries: new Set(), languages: new Set(), directors: new Set(), writers: new Set(),
+    media_types: new Set(), genres: new Set(), countries: new Set(), languages: new Set(), directors: new Set(), writers: new Set(),
     cast: new Set(), companies: new Set(), certifications: new Set(), keywords: new Set(), tags: new Set(), providers: new Set(),
   },
 };
@@ -36,11 +36,17 @@ let filmMap = new Map();
 let config;
 
 const facetLabels = {
-  genres: "Genre", countries: "Country", languages: "Language", directors: "Director", writers: "Writer",
+  media_types: "Format", genres: "Genre", countries: "Country", languages: "Language", directors: "Director", writers: "Writer",
   cast: "Cast", companies: "Company", certifications: "Certification", keywords: "Keyword", tags: "Your tag", providers: "Provider",
 };
 
 function parseNumber(v) { return v === "" ? null : Number(v); }
+
+const MEDIA_TYPE_LABELS = {
+  feature_film: "Feature film", short_film: "Short film", limited_series: "Limited series",
+  tv_series: "TV series", tv_episode: "TV episode", unknown: "Unknown",
+};
+function mediaTypeLabel(value) { return MEDIA_TYPE_LABELS[value] || String(value || "Unknown").replaceAll("_", " "); }
 
 function listNames(items) { return items?.map(x => x.name) || []; }
 function providerNames(t) {
@@ -61,6 +67,7 @@ function passes(film) {
   if (state.collection === "diary" && !(u.diary_entries || []).length) return false;
 
   if (state.q && !film._search.includes(state.q.toLocaleLowerCase())) return false;
+  if (!intersects(state.facets.media_types, [film.media_type || "unknown"])) return false;
 
   const year = Number(film.year || String(t.release_date || "").slice(0, 4) || 0);
   const yf = parseNumber(state.yearFrom), yt = parseNumber(state.yearTo);
@@ -113,6 +120,7 @@ function sortFilms(films) {
   const sorters = {
     "title-asc": (a,b) => cmpText(a.name,b.name),
     "title-desc": (a,b) => cmpText(b.name,a.name),
+    "type-asc": (a,b) => cmpText(mediaTypeLabel(a.media_type), mediaTypeLabel(b.media_type)) || cmpText(a.name,b.name),
     "year-desc": (a,b) => (b.year || 0) - (a.year || 0),
     "year-asc": (a,b) => (a.year || 9999) - (b.year || 9999),
     "rating-desc": (a,b) => (b.user?.rating ?? -1) - (a.user?.rating ?? -1),
@@ -133,14 +141,14 @@ function update() {
   renderCatalog();
   renderActiveFilters();
   $("#filtered-count").textContent = formatNumber(filtered.length);
-  $("#filtered-context").textContent = filtered.length === allFilms.length ? "of your full library" : `of ${formatNumber(allFilms.length)} films`;
+  $("#filtered-context").textContent = filtered.length === allFilms.length ? "of your full library" : `of ${formatNumber(allFilms.length)} titles`;
 }
 
 function renderCatalog() {
   const container = $("#movie-results");
   container.className = state.view === "list" ? "movie-list" : "movie-grid";
   if (!filtered.length) {
-    container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><h3>No films match this combination.</h3><p>Try removing a filter or lowering a threshold.</p><button class="button" id="empty-reset">Reset filters</button></div>`;
+    container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><h3>No titles match this combination.</h3><p>Try removing a filter or lowering a threshold.</p><button class="button" id="empty-reset">Reset filters</button></div>`;
     $("#empty-reset")?.addEventListener("click", resetFilters);
     $("#load-more-wrap").style.display = "none";
     return;
@@ -150,6 +158,7 @@ function renderCatalog() {
 }
 
 function displayFacetValue(facet, value) {
+  if (facet === "media_types") return mediaTypeLabel(value);
   if (facet === "countries") return countryName(value);
   if (facet === "languages") return languageName(value);
   return value;
@@ -165,7 +174,7 @@ function renderFacet(facet, query = "") {
   const selectedRows = rows.filter(x => selected.has(x.value));
   const rest = rows.filter(x => !selected.has(x.value));
   rows = [...selectedRows, ...rest].slice(0, q ? 80 : 36);
-  panel.innerHTML = rows.map(x => `<button class="filter-chip ${selected.has(x.value) ? "selected" : ""}" data-facet="${facet}" data-value="${encodeURIComponent(x.value)}" title="${x.count} films">${displayFacetValue(facet, x.value)} <span style="opacity:.65">${x.count}</span></button>`).join("") || `<div class="filter-summary">No matches</div>`;
+  panel.innerHTML = rows.map(x => `<button class="filter-chip ${selected.has(x.value) ? "selected" : ""}" data-facet="${facet}" data-value="${encodeURIComponent(x.value)}" title="${x.count} titles">${displayFacetValue(facet, x.value)} <span style="opacity:.65">${x.count}</span></button>`).join("") || `<div class="filter-summary">No matches</div>`;
 }
 
 function renderAllFacets() { Object.keys(state.facets).forEach(f => renderFacet(f)); }
@@ -219,7 +228,7 @@ function bindControls() {
     el.addEventListener(evt, () => { state[key] = el.value.trim(); visibleCount = config.itemsPerPage || 48; update(); });
   });
 
-  $("#facet-root").addEventListener("click", e => {
+  $("#filters").addEventListener("click", e => {
     const btn = e.target.closest("[data-facet][data-value]");
     if (!btn) return;
     const facet = btn.dataset.facet, value = decodeURIComponent(btn.dataset.value);
@@ -241,9 +250,9 @@ function bindControls() {
   $("#load-more").addEventListener("click", () => { visibleCount += config.itemsPerPage || 48; renderCatalog(); });
   $("#grid-view").addEventListener("click", () => setView("grid"));
   $("#list-view").addEventListener("click", () => setView("list"));
-  $("#export-filtered").addEventListener("click", () => { exportFilmsCsv(filtered); showToast(`Exported ${filtered.length} films`); });
+  $("#export-filtered").addEventListener("click", () => { exportFilmsCsv(filtered); showToast(`Exported ${filtered.length} titles`); });
   $("#surprise-me").addEventListener("click", () => {
-    if (!filtered.length) return showToast("No films match your current filters.");
+    if (!filtered.length) return showToast("No titles match your current filters.");
     const watchPool = filtered.filter(f => f.user?.watchlist);
     const pool = watchPool.length ? watchPool : filtered;
     const film = pool[Math.floor(Math.random() * pool.length)];
@@ -293,6 +302,7 @@ function loadSavedView(name) {
 function applyQueryParams() {
   const params = new URLSearchParams(location.search);
   if (params.get("country")) state.facets.countries.add(params.get("country").toUpperCase());
+  if (params.get("type")) state.facets.media_types.add(params.get("type"));
   if (params.get("collection")) state.collection = params.get("collection");
   if (params.get("q")) state.q = params.get("q");
 }
@@ -313,7 +323,7 @@ async function main() {
   update();
 
   const generated = data.meta?.generated_at ? new Date(data.meta.generated_at).toLocaleString() : "unknown";
-  $("#data-status").textContent = `${formatNumber(data.meta?.film_count || 0)} films · metadata build ${generated}`;
+  $("#data-status").textContent = `${formatNumber(data.meta?.film_count || 0)} titles · metadata build ${generated}`;
   if (!data.meta?.tmdb_enabled && allFilms.length) showToast("TMDB enrichment is not enabled yet. See About → Setup.", 5000);
 }
 

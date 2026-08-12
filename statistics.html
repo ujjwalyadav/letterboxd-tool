@@ -12,9 +12,9 @@
   <main id="main" class="page-shell">
     <section class="hero" style="min-height:260px">
       <div class="hero-orbit" aria-hidden="true"></div>
-      <div class="hero-copy"><div class="eyebrow">Your viewing patterns</div><h1 style="font-size:clamp(2.5rem,6vw,5rem)">Statistics without the noise.</h1><p>See where your time goes, what you rate highly, the creators and places you return to, and what your watchlist says about your future viewing.</p></div>
+      <div class="hero-copy"><div class="eyebrow">Your viewing patterns</div><h1 style="font-size:clamp(2.5rem,6vw,5rem)">Statistics without the noise.</h1><p>See where your time goes, what you rate highly, the creators and places you return to, and what your watchlist says about your future viewing — separately for films, shorts, series and episodes.</p></div>
     </section>
-    <div class="section-header"><div><h2>Overview</h2><p>Change the scope to compare what you have seen with what you are planning to see.</p></div><select class="select" id="scope" style="width:auto"><option value="watched">Watched</option><option value="watchlist">Watchlist</option><option value="all">Everything</option></select></div>
+    <div class="section-header"><div><h2>Overview</h2><p>Change the collection and format to compare exactly the part of your library you want.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><select class="select" id="stats-media-type" style="width:auto"><option value="all">All formats</option><option value="feature_film">Feature films</option><option value="short_film">Short films</option><option value="limited_series">Limited series</option><option value="tv_series">TV series</option><option value="tv_episode">TV episodes</option><option value="unknown">Unknown</option></select><select class="select" id="scope" style="width:auto"><option value="watched">Watched</option><option value="watchlist">Watchlist</option><option value="all">Everything</option></select></div></div>
     <section class="kpi-strip" id="kpi-strip"></section>
     <div id="stats-root">
       <section class="insight-banner">
@@ -25,6 +25,7 @@
       <section class="section stats-grid">
         <article class="surface stat-card wide"><div class="card-heading"><div><h3>Watching activity</h3><p>Diary entries by year</p></div></div><div class="chart-wrap"><canvas id="watching-by-year"></canvas></div></article>
         <article class="surface stat-card"><div class="card-heading"><div><h3>Your rating curve</h3><p>Personal Letterboxd ratings</p></div></div><div class="chart-wrap"><canvas id="rating-distribution"></canvas></div></article>
+        <article class="surface stat-card"><div class="card-heading"><div><h3>Formats</h3><p>Feature films, shorts, series and episodes</p></div></div><div class="chart-wrap"><canvas id="media-type-chart"></canvas></div></article>
         <article class="surface stat-card"><div class="card-heading"><div><h3>Top genres</h3><p>Most represented categories</p></div></div><div class="chart-wrap"><canvas id="genre-chart"></canvas></div></article>
         <article class="surface stat-card"><div class="card-heading"><div><h3>Decades</h3><p>Where your films come from in time</p></div></div><div class="chart-wrap"><canvas id="decade-chart"></canvas></div></article>
         <article class="surface stat-card"><div class="card-heading"><div><h3>Runtime profile</h3><p>How long your films tend to be</p></div></div><div class="chart-wrap"><canvas id="runtime-chart"></canvas></div></article>
