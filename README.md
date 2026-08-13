@@ -18,7 +18,7 @@ It is designed for a simple maintenance loop: replace your Letterboxd CSV files,
 - Rewatch filtering
 - Watchlist-added and last-watched date filters
 - Multi-select filters for genres, countries, languages, directors, cast, keywords, diary tags and streaming/provider names
-- Sorting by title, release year, personal rating, TMDB rating, TMDB votes, popularity, runtime, recent watching and watchlist age
+- Sorting by title, release year, personal rating, Letterboxd community rating, Letterboxd watch count, popularity, runtime, recent watching and watchlist age
 - Poster grid and compact list views
 - Saved filter presets in browser localStorage
 - Random / “Surprise me” picker from the current filtered set
