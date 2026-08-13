@@ -171,7 +171,7 @@ Do not commit your token.
 
 Your **personal** Letterboxd ratings are imported automatically from `ratings.csv`.
 
-Community-wide Letterboxd averages, watch counts and likes are not automatically scraped. Letterboxd currently makes official API access request-only and states that it is not granting access for personal/private projects or data-analysis, visualization and recommendation projects. The optional `data/letterboxd_community.csv` file exists so you can add those fields later from an authorized source without changing the website.
+Community-wide Letterboxd averages, watch counts and likes are not automatically scraped. Letterboxd currently makes official API access request-only and states that it is not granting access for personal/private projects or data-analysis, visualization and recommendation projects. The optional `data/letterboxd_community.csv` file exists so you can add those fields later from an authorized source without changing the website. The Explore page can filter watch counts as a minimum and maximum range.
 
 ## TMDB and JustWatch attribution
 

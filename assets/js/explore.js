@@ -17,6 +17,7 @@ const state = {
   tmdbVotesMin: "",
   lbRatingMin: "",
   lbWatchesMin: "",
+  lbWatchesMax: "",
   rewatch: "all",
   addedAfter: "",
   watchedAfter: "",
@@ -93,6 +94,8 @@ function passes(film) {
   if (lbRatingMin != null && (lb.average_rating == null || Number(lb.average_rating) < lbRatingMin)) return false;
   const lbWatchesMin = parseNumber(state.lbWatchesMin);
   if (lbWatchesMin != null && (lb.watches == null || Number(lb.watches) < lbWatchesMin)) return false;
+  const lbWatchesMax = parseNumber(state.lbWatchesMax);
+  if (lbWatchesMax != null && (lb.watches == null || Number(lb.watches) > lbWatchesMax)) return false;
 
   if (state.rewatch === "yes" && !(u.rewatch_count > 0)) return false;
   if (state.rewatch === "no" && (!u.watched || u.rewatch_count > 0)) return false;
@@ -188,7 +191,7 @@ function renderActiveFilters() {
   const scalarLabels = [
     ["q", "Search"], ["yearFrom", "Year ≥"], ["yearTo", "Year ≤"], ["runtimeMin", "Runtime ≥"], ["runtimeMax", "Runtime ≤"],
     ["ratingMin", "Your rating ≥"], ["ratingMax", "Your rating ≤"], ["tmdbRatingMin", "TMDB ≥"], ["tmdbVotesMin", "TMDB votes ≥"],
-    ["lbRatingMin", "Letterboxd community ≥"], ["lbWatchesMin", "Letterboxd watches ≥"],
+    ["lbRatingMin", "Letterboxd community ≥"], ["lbWatchesMin", "Letterboxd watches ≥"], ["lbWatchesMax", "Letterboxd watches ≤"],
     ["addedAfter", "Watchlist added after"], ["watchedAfter", "Watched after"],
   ];
   scalarLabels.forEach(([key, label]) => { if (state[key]) chips.push(`<span class="active-filter">${label}: ${state[key]}<button data-clear-key="${key}" aria-label="Remove">×</button></span>`); });
@@ -199,7 +202,7 @@ function renderActiveFilters() {
 
 function resetFilters() {
   state.q = ""; state.collection = "all"; state.yearFrom = ""; state.yearTo = ""; state.runtimeMin = ""; state.runtimeMax = "";
-  state.ratingMin = ""; state.ratingMax = ""; state.tmdbRatingMin = ""; state.tmdbVotesMin = ""; state.lbRatingMin = ""; state.lbWatchesMin = ""; state.rewatch = "all";
+  state.ratingMin = ""; state.ratingMax = ""; state.tmdbRatingMin = ""; state.tmdbVotesMin = ""; state.lbRatingMin = ""; state.lbWatchesMin = ""; state.lbWatchesMax = ""; state.rewatch = "all";
   state.addedAfter = ""; state.watchedAfter = "";
   Object.values(state.facets).forEach(s => s.clear());
   syncControls(); renderAllFacets(); visibleCount = config.itemsPerPage || 48; update();
@@ -208,7 +211,7 @@ function resetFilters() {
 function syncControls() {
   const map = {
     "search": "q", "collection": "collection", "year-from": "yearFrom", "year-to": "yearTo", "runtime-min": "runtimeMin", "runtime-max": "runtimeMax",
-    "rating-min": "ratingMin", "rating-max": "ratingMax", "tmdb-rating-min": "tmdbRatingMin", "tmdb-votes-min": "tmdbVotesMin", "lb-rating-min": "lbRatingMin", "lb-watches-min": "lbWatchesMin",
+    "rating-min": "ratingMin", "rating-max": "ratingMax", "tmdb-rating-min": "tmdbRatingMin", "tmdb-votes-min": "tmdbVotesMin", "lb-rating-min": "lbRatingMin", "lb-watches-min": "lbWatchesMin", "lb-watches-max": "lbWatchesMax",
     "rewatch": "rewatch", "added-after": "addedAfter", "watched-after": "watchedAfter", "sort": "sort",
   };
   Object.entries(map).forEach(([id, key]) => { const el = $(`#${id}`); if (el) el.value = state[key]; });
@@ -219,7 +222,7 @@ function syncControls() {
 function bindControls() {
   const bindings = {
     "search": "q", "collection": "collection", "year-from": "yearFrom", "year-to": "yearTo", "runtime-min": "runtimeMin", "runtime-max": "runtimeMax",
-    "rating-min": "ratingMin", "rating-max": "ratingMax", "tmdb-rating-min": "tmdbRatingMin", "tmdb-votes-min": "tmdbVotesMin", "lb-rating-min": "lbRatingMin", "lb-watches-min": "lbWatchesMin",
+    "rating-min": "ratingMin", "rating-max": "ratingMax", "tmdb-rating-min": "tmdbRatingMin", "tmdb-votes-min": "tmdbVotesMin", "lb-rating-min": "lbRatingMin", "lb-watches-min": "lbWatchesMin", "lb-watches-max": "lbWatchesMax",
     "rewatch": "rewatch", "added-after": "addedAfter", "watched-after": "watchedAfter", "sort": "sort",
   };
   Object.entries(bindings).forEach(([id, key]) => {
